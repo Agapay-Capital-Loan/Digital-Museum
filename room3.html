@@ -1,0 +1,221 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Room 1 - Wildlife Exhibit</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body, html {
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #000; /* Added solid background */
+        }
+
+        #room-viewport {
+            height: 100vh;
+            width: 100vw;
+            background-color: #000; /* Black background para sa mga gilid */
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: contain; /* Pinalitan ang cover ng contain para makita ng buo ang image */
+            position: relative;
+            transition: background-image 0.6s ease-in-out; /* Inayos ang transition para sa image lang */
+            cursor: pointer;
+        }
+
+        .nav-btn {
+            position: absolute;
+            bottom: 30px;
+            padding: 12px 30px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            border: 2px solid white;
+            cursor: pointer;
+            z-index: 10;
+            text-transform: uppercase;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+            .nav-btn:hover {
+                background: white;
+                color: black;
+            }
+
+        .back-btn {
+            top: 20px;
+            left: 20px;
+            bottom: auto;
+        }
+
+        .prev-btn {
+            left: 30px;
+        }
+
+        .next-btn {
+            right: 30px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: #f4ece4;
+            padding: 40px;
+            border-radius: 15px;
+            text-align: center;
+            max-width: 500px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            animation: popIn 0.3s ease-out;
+        }
+
+        @keyframes popIn {
+            from {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .close-btn {
+            margin-top: 25px;
+            padding: 10px 25px;
+            background: #333;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .hotspot {
+            position: absolute;
+            top: 25%;
+            left: 35%;
+            width: 30%;
+            height: 60%;
+            z-index: 4;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="room-viewport" onclick="showCurrentInfo()">
+
+        <button class="nav-btn back-btn" onclick="event.stopPropagation(); window.location.href='2nd Floor.html?page=lobby'">⬅ Exit to Hallway</button>
+
+        <button class="nav-btn prev-btn" onclick="event.stopPropagation(); changeSlide(-1)">◀ Previous</button>
+        <button class="nav-btn next-btn" onclick="event.stopPropagation(); changeSlide(1)">Next ▶</button>
+
+        <div id="hotspot-container">
+            <div class="hotspot" id="polar-bear-zone"></div>
+        </div>
+    </div>
+
+    <div id="infoModal" class="modal">
+        <div class="modal-content">
+            <h2 id="modal-title">Name</h2>
+            <hr style="margin: 15px 0; border: 0; border-top: 1px solid #ccc;">
+            <p id="modal-desc">Description</p>
+            <button class="close-btn" onclick="closeInfo()">CLOSE</button>
+        </div>
+    </div>
+
+    <script>
+        const museumData = [
+            {
+                image: 'arin.jpg',
+                title: ' The Art of Arin Alaos ',
+                description: 'This artwork, called Arin Alaos, shows a human figure carefully shaped from twisted wire. It was created by  Mark delos Santos and Abet Sison—artists who are also known for taking part in local art projects and collaborations in Pangasinan. The figure looks like it`s in motion, leaning forward while holding a thin, sword- like object, which gives it a strong sense of action and tension.The use of wire makes the piece feel both strong and fragile at the same time but it reflects themes of struggle, movement, and human expression through a simple but powerful material.'
+            },
+            {
+                image: 'carlos.jpg',
+                title: ' The Oil Poirtrait of Carlos Bulosan ',
+                description: 'The oil portrait of Carlos Bulosan by Van Zachary Turingan is displayed in Lingayen, Pangasinan. It is part of an exhibit that honors important historical and cultural figures from the region. Van Zachary Turingan is a local artist known for detailed portraits made with acrylic and oil on canvas, often focusing on local stories and themes. In this artwork, he gives a face to Bulosan, a Pangasinan native who became a well-known voice for Filipino immigrants in America. This piece was included in the museum’s opening exhibit, which highlights Bulosan alongside other local legends.'
+            },
+            {
+                image: 'urduja.jpg',
+                title: 'Princess Urduja',
+                description: 'The painting shows Princess Urduja, a legendary warrior queen from Pangasinan in the Philippines. It is displayed at the Banaan Pangasinan Provincial Museum in Lingayen. Urduja is often remembered as a leader of an army of women warriors and is seen as a symbol of both strength and beauty in Philippine history. The museum features this artwork along with other artifacts to help preserve the cultural heritage and history of Pangasinan. this piece is part of a collection that brings local myths and historical figures to life for visitors.'
+            },
+            {
+                image: 'apolaki.jpg',
+                title: 'Apolaki: God of Sun and War',
+                description: 'In Pangasinan folklore, Apolaki (also known as Apolaqui) is regarded as the supreme god of the sun and war, and his name translates to “Big Lord” from apo meaning lord or respected elder, and laki meaning big. The artwork titled “Panamalsa nen Apolaki Ed baley ya pinabil” depicts the creation (panamalsa) of this sun god in the beloved town (baley ya pinabil). In ancient times, early Pangasinenses worshipped Apolaki as a major deity, offering oils, fragrant items, and sacrifices in his honor. Today, he continues to symbolize leadership, strategy, and strength, often seen as a patron of modern warriors, including soldiers and Arnis practitioners. Through this piece, artist Prince Logan draws from these myths to reconnect audiences with pre-colonial identity and highlight Apolaki as a lasting source of pride for the community.'
+            },
+            {
+                image: 'ink.jpg',
+                title: 'Senate Ink Dish',
+                description: 'The Senate Ink Dish was presented to Manuel L. Quezon on January 1, 1925 as a commemorative gift. It is a finely crafted crystal glass inkwell set on a green opaline base. The piece is distinguished by the engraved initials “MLQ” on its surface. It is often shown alongside a matching calendar holder, forming a formal desk set from the period. This historical object honors Quezon’s leadership during the 1924 Independence Mission to Washington D.C.'
+            },
+            {
+                image: 'civet.jpg',
+                title: 'Malabar large-spotted civet',
+                description: 'This museum artwork shows the Malabar large-spotted civet, a rare animal that lives in the Western Ghats of India. Malabar large-spotted civet It is now critically endangered, with fewer than 250 adults believed to still exist. The artwork highlights its spotted fur and quiet, secretive behavior in the wild. It also reminds us how its forest home has been shrinking because of human activity and hunting. Through this artwork, viewers are invited to reflect on the urgency of protecting species that are slowly disappearing from the wild.'
+            },
+           
+        ];
+
+        let currentIndex = 0;
+
+
+        function showCurrentInfo() {
+            const data = museumData[currentIndex];
+            document.getElementById('modal-title').innerText = data.title;
+            document.getElementById('modal-desc').innerText = data.description;
+            document.getElementById('infoModal').style.display = 'flex';
+        }
+
+        function closeInfo() {
+            document.getElementById('infoModal').style.display = 'none';
+        }
+
+        function updateDisplay() {
+            const data = museumData[currentIndex];
+            const viewport = document.getElementById('room-viewport');
+            viewport.style.backgroundImage = `url('${data.image}')`;
+
+            // Hotspots toggle para sa Slide 0
+            document.getElementById('hotspot-container').style.display = (currentIndex === 0) ? 'block' : 'none';
+        }
+
+        function changeSlide(direction) {
+            currentIndex += direction;
+            if (currentIndex >= museumData.length) currentIndex = 0;
+            if (currentIndex < 0) currentIndex = museumData.length - 1;
+            updateDisplay();
+        }
+
+        window.onload = updateDisplay;
+
+        // Close modal pag na-click ang background ng modal mismo
+        window.onclick = function (event) {
+            const modal = document.getElementById('infoModal');
+            if (event.target == modal) {
+                closeInfo();
+            }
+        }
+    </script>
+</body>
+</html>

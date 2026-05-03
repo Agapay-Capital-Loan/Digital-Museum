@@ -1,0 +1,337 @@
+﻿<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Room 1 - Wildlife Exhibit</title>
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body, html {
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        #room-viewport {
+            height: 100vh;
+            width: 100vw;
+            background: no-repeat center center fixed;
+            background-size: cover;
+            position: relative;
+            transition: background 0.6s ease-in-out;
+            cursor: pointer;
+        }
+
+        .nav-btn {
+            position: absolute;
+            bottom: 30px;
+            padding: 12px 30px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            border: 2px solid white;
+            cursor: pointer;
+            z-index: 10;
+            text-transform: uppercase;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+            .nav-btn:hover {
+                background: white;
+                color: black;
+            }
+
+        .back-btn {
+            top: 20px;
+            left: 20px;
+            bottom: auto;
+        }
+
+        .prev-btn {
+            left: 30px;
+        }
+
+
+
+        .next-btn {
+            right: 30px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: #f4ece4;
+            padding: 40px;
+            border-radius: 15px;
+            text-align: center;
+            max-width: 500px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            animation: popIn 0.3s ease-out;
+        }
+
+        @keyframes popIn {
+
+            from {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .close-btn {
+            margin-top: 25px;
+            padding: 10px 25px;
+            background: #333;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .hotspot {
+            position: absolute;
+            top: 25%;
+            left: 35%;
+            width: 30%;
+            height: 60%;
+            z-index: 4;
+        }
+    </style>
+
+</head>
+
+<body>
+
+
+
+    <div id="room-viewport" onclick="showCurrentInfo()">
+
+
+
+        <button class="nav-btn back-btn" onclick="event.stopPropagation(); window.location.href='Digital Museum.html?page=lobby'">⬅ Exit to Lobby</button>
+
+
+
+        <button class="nav-btn prev-btn" onclick="event.stopPropagation(); changeSlide(-1)">◀ Previous</button>
+
+        <button class="nav-btn next-btn" onclick="event.stopPropagation(); changeSlide(1)">Next ▶</button>
+
+
+
+        <div id="hotspot-container">
+
+            <div class="hotspot" id="polar-bear-zone"></div>
+
+        </div>
+
+    </div>
+
+
+
+    <div id="infoModal" class="modal">
+
+        <div class="modal-content">
+
+            <h2 id="modal-title">Name</h2>
+
+            <hr style="margin: 15px 0; border: 0; border-top: 1px solid #ccc;">
+
+            <p id="modal-desc">Description</p>
+
+            <button class="close-btn" onclick="closeInfo()">CLOSE</button>
+
+        </div>
+
+    </div>
+
+
+
+    <script>
+
+        const museumData = [
+
+            {
+
+                image: 'polar.jpg',
+
+                title: ' Polar ',
+
+                description: 'Ang polar bear  ay kulay puti'
+
+            },
+
+            {
+
+                image: 'deer.jpg',
+
+                title: ' Deer ',
+
+                description: 'mabilis sha tomakbo.'
+
+            },
+
+            {
+
+                image: 'pusa.jpg',
+
+                title: 'mga pusa',
+
+                description: 'madami sila'
+
+            },
+
+            {
+
+                image: 'usa.jpg',
+
+                title: 'deer pero madami',
+
+                description: 'madami sila '
+
+            },
+
+            {
+
+                image: 'lion.jpg',
+
+                title: 'lion king',
+
+                description: 'layon'
+
+            },
+
+            {
+
+                image: 'lobo.jpg',
+
+                title: 'wolfgang',
+
+                description: 'apat paa'
+
+            },
+
+            {
+
+                image: 'tamaraw.jpg',
+
+                title: 'tamaraw tapos layon',
+
+                description: 'kinakain sya ng layon'
+
+            }
+
+        ];
+
+
+
+        let currentIndex = 0;
+
+
+
+        // Function para ipakita ang info modal (On Click)
+
+        function showCurrentInfo() {
+
+            const data = museumData[currentIndex];
+
+            document.getElementById('modal-title').innerText = data.title;
+
+            document.getElementById('modal-desc').innerText = data.description;
+
+            document.getElementById('infoModal').style.display = 'flex';
+
+        }
+
+
+
+        function closeInfo() {
+
+            document.getElementById('infoModal').style.display = 'none';
+
+        }
+
+
+
+        function updateDisplay() {
+
+            const data = museumData[currentIndex];
+
+            const viewport = document.getElementById('room-viewport');
+
+            viewport.style.backgroundImage = `url('${data.image}')`;
+
+
+
+            // Hotspots toggle para sa Slide 0
+
+            document.getElementById('hotspot-container').style.display = (currentIndex === 0) ? 'block' : 'none';
+
+        }
+
+
+
+        function changeSlide(direction) {
+
+            currentIndex += direction;
+
+            if (currentIndex >= museumData.length) currentIndex = 0;
+
+            if (currentIndex < 0) currentIndex = museumData.length - 1;
+
+            updateDisplay();
+
+        }
+
+
+
+        window.onload = updateDisplay;
+
+
+
+        // Close modal pag na-click ang background ng modal mismo
+
+        window.onclick = function (event) {
+
+            const modal = document.getElementById('infoModal');
+
+            if (event.target == modal) {
+
+                closeInfo();
+
+            }
+
+        }
+
+    </script>
+
+</body>
+
+</html>

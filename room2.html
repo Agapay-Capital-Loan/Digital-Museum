@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Room 1 - Wildlife Exhibit</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body, html {
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #000; /* Added solid background */
+        }
+
+        #room-viewport {
+            height: 100vh;
+            width: 100vw;
+            background-color: #000; /* Black background para sa mga gilid */
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: contain; /* Pinalitan ang cover ng contain para makita ng buo ang image */
+            position: relative;
+            transition: background-image 0.6s ease-in-out; /* Inayos ang transition para sa image lang */
+            cursor: pointer;
+        }
+
+        .nav-btn {
+            position: absolute;
+            bottom: 30px;
+            padding: 12px 30px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            border: 2px solid white;
+            cursor: pointer;
+            z-index: 10;
+            text-transform: uppercase;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+            .nav-btn:hover {
+                background: white;
+                color: black;
+            }
+
+        .back-btn {
+            top: 20px;
+            left: 20px;
+            bottom: auto;
+        }
+
+        .prev-btn {
+            left: 30px;
+        }
+
+        .next-btn {
+            right: 30px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: #f4ece4;
+            padding: 40px;
+            border-radius: 15px;
+            text-align: center;
+            max-width: 500px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            animation: popIn 0.3s ease-out;
+        }
+
+        @keyframes popIn {
+            from {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .close-btn {
+            margin-top: 25px;
+            padding: 10px 25px;
+            background: #333;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .hotspot {
+            position: absolute;
+            top: 25%;
+            left: 35%;
+            width: 30%;
+            height: 60%;
+            z-index: 4;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="room-viewport" onclick="showCurrentInfo()">
+
+        <button class="nav-btn back-btn" onclick="event.stopPropagation(); window.location.href='Digital Museum.html?page=lobby'">⬅ Exit to Lobby</button>
+
+        <button class="nav-btn prev-btn" onclick="event.stopPropagation(); changeSlide(-1)">◀ Previous</button>
+        <button class="nav-btn next-btn" onclick="event.stopPropagation(); changeSlide(1)">Next ▶</button>
+
+        <div id="hotspot-container">
+            <div class="hotspot" id="polar-bear-zone"></div>
+        </div>
+    </div>
+
+    <div id="infoModal" class="modal">
+        <div class="modal-content">
+            <h2 id="modal-title">Name</h2>
+            <hr style="margin: 15px 0; border: 0; border-top: 1px solid #ccc;">
+            <p id="modal-desc">Description</p>
+            <button class="close-btn" onclick="closeInfo()">CLOSE</button>
+        </div>
+    </div>
+
+    <script>
+        const museumData = [
+            {
+                image: 'Calendar holder.jpg',
+                title: ' MLQ Calendar Holder ',
+                description: 'This is a silver calendar holder with a green glass base that belonged to President Manuel L. Quezon. It was used on his desk to help him keep track of his daily meetings and important tasks. It is important because it shows us a personal item that the President used every day to stay organized while leading the country.'
+            },
+            {
+                image: 'vase.jpg',
+                title: ' Sterling Silver Vase ',
+                description: 'This silver vase was a gift given to Quezon by the Philippine Senate on New Year’s Day in 1924. It was used to hold flowers and decorate the rooms where the President met with important visitors. It is significant because it shows the high level of respect the government leaders had for Quezon during his time in office.'
+            },
+            {
+                image: 'plaque.jpg',
+                title: 'Obelisk Plaque',
+                description: 'This small stone monument with silver plates was given to Quezon by a group called Lodge Nilad. It was made to thank him for his hard work representing the Filipino people while he was in the United States. This item is important because it honors his early efforts to help the Philippines become an independent nation.'
+            },
+            {
+                image: 'dyip.jpg',
+                title: 'Dyip ni Magsaysay (1943 Willys Jeep)',
+                description: 'This 1943 Jeep was a military vehicle used by Ramon Magsaysay when he was the Secretary of National Defense. He used it to travel to far-away villages and provinces so he could talk directly to the regular people. It is significant because it became a famous symbol of his simple lifestyle and his "man of the people" personality.'
+            },
+            {
+                image: 'calendar.jpg',
+                title: '1936 Calendar',
+                description: ' This is a large calendar from the year 1936, which was the first full year of the Philippine Commonwealth government. It was used to keep track of time during the country`s very important move toward becoming its own boss.It is significant because it marks the specific days and months when our modern government was just beginning.'
+            },
+            {
+                image: '1953.jpg',
+                title: '1953 Chrysler Imperial',
+                description: 'This big black car was the official vehicle used by President Ramon Magsaysay during his time in Malacañang. It was used to drive the President safely to his official events and was identified by the "1" on its license plate. The car is significant because it represents the dignity and honor of the Philippine presidency in the 1950`s.'
+            },
+            {
+                image: '1937.jpg',
+                title: '1937 Chrysler Airflow',
+                description: 'This special car was used by President Quezon and was famous for having a smooth, curved shape that helped it move faster. It was used for his official travels and showed that the Philippines was a modern and growing country. It is important today because it is a very rare car that was part of the President’s personal history.'
+            }
+        ];
+
+        let currentIndex = 0;
+
+  
+        function showCurrentInfo() {
+            const data = museumData[currentIndex];
+            document.getElementById('modal-title').innerText = data.title;
+            document.getElementById('modal-desc').innerText = data.description;
+            document.getElementById('infoModal').style.display = 'flex';
+        }
+
+        function closeInfo() {
+            document.getElementById('infoModal').style.display = 'none';
+        }
+
+        function updateDisplay() {
+            const data = museumData[currentIndex];
+            const viewport = document.getElementById('room-viewport');
+            viewport.style.backgroundImage = `url('${data.image}')`;
+
+            // Hotspots toggle para sa Slide 0
+            document.getElementById('hotspot-container').style.display = (currentIndex === 0) ? 'block' : 'none';
+        }
+
+        function changeSlide(direction) {
+            currentIndex += direction;
+            if (currentIndex >= museumData.length) currentIndex = 0;
+            if (currentIndex < 0) currentIndex = museumData.length - 1;
+            updateDisplay();
+        }
+
+        window.onload = updateDisplay;
+
+        // Close modal pag na-click ang background ng modal mismo
+        window.onclick = function (event) {
+            const modal = document.getElementById('infoModal');
+            if (event.target == modal) {
+                closeInfo();
+            }
+        }
+    </script>
+</body>
+</html>

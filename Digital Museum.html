@@ -1,0 +1,184 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Museum</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #2c2c2c;
+            color: #333;
+            overflow-x: hidden;
+        }
+
+    
+        .screen {
+            display: none; 
+            min-height: 100vh;
+            width: 100vw;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.5s ease-in-out;
+            position: relative;
+        }
+
+         
+            .screen.active {
+                display: flex;
+            }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.98);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+
+        #home {
+            background: url('museum.png') no-repeat center center/cover;
+            background-color: #e3d5c8;
+        }
+
+        .door-btn {
+            position: absolute;
+            bottom: 15%;
+            padding: 15px 40px;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            font-size: 1.2rem;
+            border: 2px solid white;
+            cursor: pointer;
+            transition: 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+            .door-btn:hover {
+                background-color: white;
+                color: black;
+                box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+            }
+
+
+        #lobby {
+            background-image: url('try.png');
+            background-position: center center;
+            background-repeat: no-repeat;
+        
+            background-size: cover;
+            background-color: #f4ece4;
+            position: relative;
+        }
+
+   
+        .room-btn {
+            position: absolute;
+            padding: 8px 20px;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            font-size: 1.2rem;
+            border: 2px solid white;
+            cursor: pointer;
+            transition: 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border-radius: 5px;
+        }
+
+            .room-btn:hover {
+                background-color: white;
+                color: black;
+                box-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
+                transform: scale(1.05);
+            }
+
+        #btn-room1 {
+            top: 80%;
+            left: 14.4%;
+        }
+
+        #btn-room2 {
+            top: 80%;
+            right: 13%;
+
+        }
+
+        #btn-room3 {
+            top: 52%;
+            right: 51%;
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            padding: 10px 20px;
+            background-color: #333;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            z-index: 10;
+        }
+
+            .back-btn:hover {
+                background-color: #555;
+            }
+    </style>
+</head>
+<body>
+
+    <div id="home" class="screen">
+        <button class="door-btn" onclick="goTo('lobby')">Enter Museum</button>
+    </div>
+
+    <div id="lobby" class="screen">
+        <button class="back-btn" onclick="goTo('home')">⬅ Exit Museum</button>
+
+        <button id="btn-room1" class="room-btn" onclick="window.location.href='room1.html'">Enter Room 1</button>
+        <button id="btn-room2" class="room-btn" onclick="window.location.href='room2.html'">Enter Room 2</button>
+        <button id="btn-room3" class="room-btn" onclick="window.location.href='2nd Floor.html'">2nd Floor</button>
+    </div>
+
+    <script>
+        function goTo(screenId) {
+            const screens = document.querySelectorAll('.screen');
+            screens.forEach(screen => {
+                screen.classList.remove('active');
+            });
+
+            const targetScreen = document.getElementById(screenId);
+            if (targetScreen) {
+                targetScreen.classList.add('active');
+            }
+            window.scrollTo(0, 0);
+        }
+
+   
+        window.onload = function () {
+            const urlParams = new URLSearchParams(window.location.search);
+            const page = urlParams.get('page');
+
+            if (page === 'lobby') {
+                goTo('lobby'); 
+            } else {
+                goTo('home');  
+            }
+        };
+    </script>
+</body>
+</html>

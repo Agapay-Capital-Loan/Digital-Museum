@@ -1,0 +1,216 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Room 1 - Wildlife Exhibit</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body, html {
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #000; /* Added solid background */
+        }
+
+        #room-viewport {
+            height: 100vh;
+            width: 100vw;
+            background-color: #000; /* Black background para sa mga gilid */
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: contain; /* Pinalitan ang cover ng contain para makita ng buo ang image */
+            position: relative;
+            transition: background-image 0.6s ease-in-out; /* Inayos ang transition para sa image lang */
+            cursor: pointer;
+        }
+
+        .nav-btn {
+            position: absolute;
+            bottom: 30px;
+            padding: 12px 30px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            border: 2px solid white;
+            cursor: pointer;
+            z-index: 10;
+            text-transform: uppercase;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+            .nav-btn:hover {
+                background: white;
+                color: black;
+            }
+
+        .back-btn {
+            top: 20px;
+            left: 20px;
+            bottom: auto;
+        }
+
+        .prev-btn {
+            left: 30px;
+        }
+
+        .next-btn {
+            right: 30px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: #f4ece4;
+            padding: 40px;
+            border-radius: 15px;
+            text-align: center;
+            max-width: 500px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            animation: popIn 0.3s ease-out;
+        }
+
+        @keyframes popIn {
+            from {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .close-btn {
+            margin-top: 25px;
+            padding: 10px 25px;
+            background: #333;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .hotspot {
+            position: absolute;
+            top: 25%;
+            left: 35%;
+            width: 30%;
+            height: 60%;
+            z-index: 4;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="room-viewport" onclick="showCurrentInfo()">
+
+        <button class="nav-btn back-btn" onclick="event.stopPropagation(); window.location.href='2nd Floor.html?page=lobby'">⬅ Exit to Hallway</button>
+
+        <button class="nav-btn prev-btn" onclick="event.stopPropagation(); changeSlide(-1)">◀ Previous</button>
+        <button class="nav-btn next-btn" onclick="event.stopPropagation(); changeSlide(1)">Next ▶</button>
+
+        <div id="hotspot-container">
+            <div class="hotspot" id="polar-bear-zone"></div>
+        </div>
+    </div>
+
+    <div id="infoModal" class="modal">
+        <div class="modal-content">
+            <h2 id="modal-title">Name</h2>
+            <hr style="margin: 15px 0; border: 0; border-top: 1px solid #ccc;">
+            <p id="modal-desc">Description</p>
+            <button class="close-btn" onclick="closeInfo()">CLOSE</button>
+        </div>
+    </div>
+
+    <script>
+        const museumData = [
+            {
+                image: 'mermaid.jpg',
+                title: ' The Mermaid of San Juan River ',
+                description: 'The Mermaid of the San Juan River is a mysterious figure believed to live in the waters of the San Juan River. She is often described as a beautiful woman with long hair and the tail of a fish. According to local stories, she appears near the riverbanks, especially at night. Many people believe her presence reminds villagers to respect the river and stay safe. This legend has been passed down through generations and remains an important part of local folklore.'
+            },
+            {
+                image: 'skull.jpg',
+                title: ' Bolinao Skull ',
+                description: 'The Bolinao Skull is an important archaeological discovery found in Bolinao. It is known for having ancient gold dental decorations attached to the teeth. These gold ornaments show that early Filipinos had advanced knowledge of dental art and goldworking. The discovery also suggests that gold symbolized wealth and social status in early societies. Today, the Bolinao Skull helps historians understand the culture and craftsmanship of ancient Filipinos.'
+            },
+            {
+                image: 'battle.jpg',
+                title: 'Battle of Malong',
+                description: 'The Malong Revolt included battles led by Andres Malong against Spanish forces in Pangasinan. Andres Malong led the revolt because many locals were unhappy with Spanish rule. He declared himself king after gaining support from nearby towns. At first, his forces succeeded in capturing several areas from the Spanish. However, Spanish reinforcements later defeated Malong, ending the revolt.'
+            },
+            {
+                image: 'victorio.jpg',
+                title: 'Victorio Edades',
+                description: 'Victorio Edades was a well-known Filipino artist called the Father of Modern Philippine Art. He was born in Dagupan and became famous for introducing modern art styles in the country. Unlike traditional artists, he painted realistic scenes of everyday workers and used darker tones. His works challenged the classical style that was popular at that time. Through his teaching and artworks, he helped shape the future of modern Philippine art.'
+            },
+            {
+                image: 'bolinao church.jpg',
+                title: 'St. James the Great Parish Church (Bolinao Church)',
+                description: ' The painting shows the St. James the Great Parish Church, a historic church located in Bolinao. This church was built during the Spanish colonial period and is considered one of the oldest churches in the area. It is known for its large stone structure and tall bell tower. The church served as an important place of worship and gathering for the community. Today, it stands as a symbol of the town’s religious and cultural heritage.'
+            },
+           
+        ];
+
+        let currentIndex = 0;
+
+
+        function showCurrentInfo() {
+            const data = museumData[currentIndex];
+            document.getElementById('modal-title').innerText = data.title;
+            document.getElementById('modal-desc').innerText = data.description;
+            document.getElementById('infoModal').style.display = 'flex';
+        }
+
+        function closeInfo() {
+            document.getElementById('infoModal').style.display = 'none';
+        }
+
+        function updateDisplay() {
+            const data = museumData[currentIndex];
+            const viewport = document.getElementById('room-viewport');
+            viewport.style.backgroundImage = `url('${data.image}')`;
+
+            // Hotspots toggle para sa Slide 0
+            document.getElementById('hotspot-container').style.display = (currentIndex === 0) ? 'block' : 'none';
+        }
+
+        function changeSlide(direction) {
+            currentIndex += direction;
+            if (currentIndex >= museumData.length) currentIndex = 0;
+            if (currentIndex < 0) currentIndex = museumData.length - 1;
+            updateDisplay();
+        }
+
+        window.onload = updateDisplay;
+
+        // Close modal pag na-click ang background ng modal mismo
+        window.onclick = function (event) {
+            const modal = document.getElementById('infoModal');
+            if (event.target == modal) {
+                closeInfo();
+            }
+        }
+    </script>
+</body>
+</html>
